@@ -112,22 +112,23 @@ def test_missing_column_not_json_fails():
     with pytest.raises(SpecValidatorException):
         SpecValidator.validate(spec)
 
-
-def test_invalid_distribution():
+def test_invalid_distribution_not_sum_to_one():
     spec = {
         "rows": 3,
         "seed": 42,
         "columns": {
             "client_id": {
+                "type": "int",
                 "min": 1,
                 "max": 100,
             },
             "client_country": {
+                "type": "string",
                 "values": ["US", "UK", "CA"],
-                "distribution": ["a", "b", "c"],
+                "distribution": [0.1, 0.2, 0.3],
             },
         },
     }
 
-    with pytest.raises(SpecValidatorException):
+    with pytest.raises(SpecValidatorException, match = "Column 'client_country': 'distribution' 0.1 cannot be realized"):
         SpecValidator.validate(spec)

@@ -110,7 +110,18 @@ class SpecValidator:
         name: str, spec: Dict[str, Any], col_type: str, rows: int, unique: bool
     ) -> None:
         distribution = spec.get("distribution")
-        SpecValidator._validate_distribution(name, distribution, rows)
+        values = spec.get("values")
+        derived_from = spec.get("derived_from")
+
+        if values is not None:
+            SpecValidator._validate_values(name, values, col_type, distribution, unique, rows)
+            SpecValidator._validate_distribution(name, distribution, rows)
+        elif derived_from is not None:
+            pass 
+        else:
+            raise SpecValidatorException(
+                f"Column '{name}': 'values' or 'derived_from' must be specified for string type"
+            )
 
     @staticmethod
     def _validate_int_column(
@@ -121,12 +132,12 @@ class SpecValidator:
         values = spec.get("values")
         distribution = spec.get("distribution")
 
-        if values:
+        if values is not None:
             if min_val or max_val:
                 raise SpecValidatorException(
                     f"Column '{name}': 'values' and 'min'/'max' are mutually exclusive"
                 )
-            SpecValidator._validate_values(name, values, distribution, unique, rows)
+            SpecValidator._validate_values(name, values, col_type, distribution, unique, rows)
             SpecValidator._validate_distribution(name, distribution, rows)
 
         if min_val > max_val:
@@ -168,16 +179,21 @@ class SpecValidator:
 
     @staticmethod
     def _validate_distribution(name: str, distribution: List[float], rows: int) -> None:
-        if sum(distribution) != 1.0:
+        for p in distribution:
+            expected = rows*p
+            if not isinstance(p, float):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'distribution' must be a list of floats"
+                )
+            if not expected.is_integer():
+                raise SpecValidatorException(
+                    f"Column '{name}': 'distribution' {p} cannot be realized"
+                )
+        if sum(distribution) < 1e-6:
             raise SpecValidatorException(
                 f"Column '{name}': 'distribution' must sum to 1.0"
             )
-        for p in distribution:
-            expected = rows*p
-            if not expected.is_integer():
-                raise SpecValidatorException(
-                    f"Column '{name}': 'distribution {p}' cannot be realized"
-                )
+        
             
         # Sanity Check
         total = sum([int(rows*p) for p in distribution])
@@ -190,11 +206,15 @@ class SpecValidator:
     def _validate_values(
         name: str,
         values: List[Any],
+        type: str,
         distribution: List[Any],
         unique: bool,
         rows: int,
-        type: str,
+        
     ) -> None:
+        if not values or len(values) == 0:
+            raise SpecValidatorException(f"Column '{name}': 'values' must be non-empty")
+        
         if not isinstance(values, list):
             raise SpecValidatorException(f"Column '{name}': 'values' must be a list")
         if not distribution:
@@ -216,7 +236,7 @@ class SpecValidator:
                 )
             if type == "string" and not isinstance(v, str):
                 raise SpecValidatorException(
-                    f"Column '{name}': 'values' must be a string"
+                    f"Column '{name}': 'values' must be a ENUM string"
                 )
         if len(values) != len(distribution):
             raise SpecValidatorException(
