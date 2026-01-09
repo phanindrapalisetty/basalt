@@ -1,25 +1,32 @@
-import pytest 
+import pytest
 from core.spec_validator import SpecValidator, SpecValidatorException
+
 
 @pytest.fixture
 def spec_validator():
     return SpecValidator()
 
+
 def test_validate_spec_valid():
     spec = {
-        "rows": 3,
+        "rows": 10,
         "seed": 42,
         "columns": {
             "client_id": {
                 "type": "int",
                 "min": 1,
                 "max": 100,
-                "unique": True
-            }
-        }
+            },
+            "client_country": {
+                "type": "string",
+                "values": ["US", "UK", "CA"],
+                "distribution": [0.3, 0.5, 0.2],
+            },
+        },
     }
 
     SpecValidator.validate(spec)
+
 
 def test_spec_not_json_fails():
     spec = """{
@@ -36,6 +43,7 @@ def test_spec_not_json_fails():
     with pytest.raises(SpecValidatorException, match="Spec must be a JSON object"):
         SpecValidator.validate(spec)
 
+
 def test_missing_seed_fails():
     spec = {
         "rows": 3,
@@ -45,11 +53,12 @@ def test_missing_seed_fails():
                 "min": 1,
                 "max": 100,
             }
-        }
+        },
     }
 
     with pytest.raises(SpecValidatorException, match="'seed' is required"):
         SpecValidator.validate(spec)
+
 
 def test_missing_rows_fails():
     spec = {
@@ -60,11 +69,12 @@ def test_missing_rows_fails():
                 "min": 1,
                 "max": 100,
             }
-        }
+        },
     }
 
     with pytest.raises(SpecValidatorException, match="'rows' is required"):
         SpecValidator.validate(spec)
+
 
 def test_missing_columns_fails():
     spec = {
@@ -75,6 +85,7 @@ def test_missing_columns_fails():
     with pytest.raises(SpecValidatorException, match="'columns' is required"):
         SpecValidator.validate(spec)
 
+
 def test_missing_column_type_fails():
     spec = {
         "rows": 3,
@@ -84,17 +95,38 @@ def test_missing_column_type_fails():
                 "min": 1,
                 "max": 100,
             }
-        }
+        },
     }
 
     with pytest.raises(SpecValidatorException):
         SpecValidator.validate(spec)
 
+
 def test_missing_column_not_json_fails():
     spec = {
         "rows": 3,
         "seed": 42,
-        "columns": """{"client_id": { "min": 1, "max": 100}}"""
+        "columns": """{"client_id": { "min": 1, "max": 100}}""",
+    }
+
+    with pytest.raises(SpecValidatorException):
+        SpecValidator.validate(spec)
+
+
+def test_invalid_distribution():
+    spec = {
+        "rows": 3,
+        "seed": 42,
+        "columns": {
+            "client_id": {
+                "min": 1,
+                "max": 100,
+            },
+            "client_country": {
+                "values": ["US", "UK", "CA"],
+                "distribution": ["a", "b", "c"],
+            },
+        },
     }
 
     with pytest.raises(SpecValidatorException):
