@@ -11,7 +11,7 @@ app = FastAPI()
 @app.get("/health")
 async def get_health_status(description="Stay healthy"):
     try:
-        return {"statuscode": 200, "message": "I'm healthy!"}
+        return JSONResponse(content={"message": "I'm healthy!"}, status_code=200)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=400)
 
