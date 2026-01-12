@@ -22,7 +22,7 @@ def generate_dataset(spec):
 
     rows = []
 
-    for i in range(spec["rows"]):
+    for i in range(spec.get("rows")):
         row = {}
         for col_name in ordered_columns:
             row[col_name] = generators[col_name].generate()
