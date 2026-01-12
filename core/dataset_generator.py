@@ -1,8 +1,10 @@
 from core.random_context import RandomContext
 from core.generators.int_generator import IntGenerator
+from core.generators.boolean_generator import BooleanGenerator
 
 def generate_dataset(spec):
     rc = RandomContext(spec.get("seed"))
+    row_count = spec.get("rows")
 
     # deterministic column order
     ordered_columns = sorted(spec.get("columns").keys())
@@ -19,6 +21,17 @@ def generate_dataset(spec):
                 unique=col.get("unique"),
                 rng=rng
             )
+
+        elif col.get("type") == "boolean":
+            generators[col_name] = BooleanGenerator(
+                rows=row_count,
+                true_ratio=col.get("true_ratio"),
+                column_name=col_name,
+                rc=rc
+            )
+        
+        else:
+            raise ValueError(f"Unsupported column type: {col.get('type')}")
 
     rows = []
 

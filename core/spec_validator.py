@@ -104,7 +104,7 @@ class SpecValidator:
         elif col_type == "float":
             SpecValidator._validate_float_column(name, spec, col_type, rows, unique)
         elif col_type == "boolean":
-            SpecValidator._validate_boolean_column(name, spec, col_type, rows, unique)
+            SpecValidator._validate_boolean_column(name, spec, rows)
         elif col_type == "date":
             SpecValidator._validate_date_column(name, spec, col_type, rows, unique)
 

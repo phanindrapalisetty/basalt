@@ -2,6 +2,8 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
 import json
+from core.spec_validator import SpecValidator, SpecValidatorException
+from core.dataset_generator import generate_dataset
 
 app = FastAPI()
 
@@ -9,14 +11,17 @@ app = FastAPI()
 @app.get("/health")
 async def get_health_status(description="Stay healthy"):
     try:
-        return {"statuscode": 200, "message": "I'm healthy!"}
+        return JSONResponse(content={"message": "I'm healthy!"}, status_code=200)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=400)
 
 
 @app.post("/generate", description="Get a random test data of your choice")
-async def generate():
+async def generate(pay_load:dict):
     try:
-        return {"statuscode": 200, "message": "I'm Pikachu!!!"}
+        validate = SpecValidator.validate(pay_load)
+        output = generate_dataset(pay_load)
+        # return {"statuscode": 200, "message": "I'm Pikachu!!!", "data":output}
+        return JSONResponse(content={"data": output}, status_code=200)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
