@@ -15,8 +15,8 @@ class BooleanGenerator:
         # IMPORTANT:
         # do NOT use the shared rc directly for shuffling, derive a local rc one: disturbs other generators
         
-        local_rc = rc.sub_rng(column_name)
-        local_rc.shuffle(self._sequence)
+        local_rng = rc.sub_rng(column_name)
+        local_rng.shuffle(self._sequence)
 
         self._index = 0
 

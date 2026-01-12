@@ -1,4 +1,5 @@
 import random
+import hashlib
 
 class RandomContext:
     def __init__(self, seed: int):
@@ -10,5 +11,6 @@ class RandomContext:
         A deterministic, isolated RNG for a specific purpose without consuming the main RNG.
         For example, shuffling in boolean and string generators.
         """
-        derived_seed = hash((self.seed, namespace)) & 0xFFFFFFFF
+        key = f"{self.seed}:{namespace}".encode()
+        derived_seed = int(hashlib.sha256(key).hexdigest(), 16) % (2**32)
         return random.Random(derived_seed)
