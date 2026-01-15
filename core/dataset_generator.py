@@ -3,7 +3,7 @@ from core.generators.int_generator import IntGenerator
 from core.generators.boolean_generator import BooleanGenerator
 from core.generators.float_generator import FloatGenerator
 from core.spec_validator import SpecValidatorException
-from core.derived_generator import DerivedStringGenerator
+from core.generators.derived_generator import DerivedStringGenerator
 
 def validate_dependencies(graph: dict[str, set[str]]) -> None:
     for col, deps in graph.items():
