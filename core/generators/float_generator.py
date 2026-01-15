@@ -30,7 +30,7 @@ class FloatGenerator:
         self._index = 0
     
     def _build_sequence(self) -> List[Optional[float]]:
-        null_count = round(self.rows * self.null_ratio)
+        null_count = int(self.rows * self.null_ratio)
         value_count = self.rows - null_count
 
         values = [
