@@ -30,7 +30,7 @@ class IntGenerator:
         self._index = 0
     
     def _build_sequence(self) -> List[Optional[int]]:
-        null_count = self.rows * self.null_ratio
+        null_count = int(self.rows * self.null_ratio)
         value_count = self.rows - null_count
 
         if self.unique:
@@ -49,7 +49,7 @@ class IntGenerator:
         
         return seq 
     
-    def generate(self) -> bool:
+    def generate(self, row: dict | None = None) -> bool:
         value = self._sequence[self._index]
         self._index += 1
         return value

@@ -25,7 +25,7 @@ class BooleanGenerator:
 
         self._index = 0
 
-    def generate(self) -> bool:
+    def generate(self, row: dict | None = None) -> bool:
         value = self._sequence[self._index]
         self._index += 1
         return value

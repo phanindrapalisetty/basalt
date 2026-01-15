@@ -4,5 +4,5 @@ class DerivedStringGenerator:
         self.template = template
 
     def generate(self, row: dict):
-        value = row[self.source_col]
+        value = row[self.depends_on]
         return self.template.format(value=value)
