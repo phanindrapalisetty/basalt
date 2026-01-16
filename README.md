@@ -6,6 +6,7 @@ This project treats synthetic data as **compiled output**, not random samples. I
 
 > same input schema + same constraints +same seed = **identical output. Always.**
 
+It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
 # Folder Structure
 ```
 basalt/
@@ -83,7 +84,7 @@ Check out the [documentation](/docs/features-v1.md) on features.
 ```json 
 [
   {"id": 64, "is_active": true},
-  { "id": 9, "is_active": false},
+  {"id": 9, "is_active": false},
   {"id": 20, "is_active": false},
   {"id": 7, "is_active": false},
   {"id": 90, "is_active": true}
