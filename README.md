@@ -17,12 +17,13 @@ basalt/
 │   ├── random_context.py
 │   ├── dataset_generator.py
 │   └── generators
-|       ├── int_generator.py
+│       ├── int_generator.py
 │       ├── boolean_generator.py
 │       ├── float_generator.py
 │       └── derived_generator.py
 ├── tests/
 │   └── golden/
+├── docs/
 ├── Dockerfile
 ├── README.md
 ├── LICENSE
@@ -45,25 +46,17 @@ If any of these break, it’s considered a **bug**, not acceptable behavior.
 ## Features (v1 scope)
 
 - Deterministic row generation
-- Per-column random generators
 - Supported column types:
-  - `int` (min, max, unique, sequential)
-  - `boolean` (true_ratio, deterministic distribution)
+  - `int` (min, max, unique, null_ratio)
+  - `boolean` (true_ratio, null_ratio)
+  - `float` (min, max, rounding, null_ratio)
+  - `string` (depends_on, distribution)
+  - `date` (min, max, null_ratio)
 - Schema-driven generation
 - Fully seed-controlled output
+- Per-column random generators
 
----
-
-## Use Cases
-
-- Backend API testing
-- Analytics pipeline testing
-- Contract testing
-- Snapshot testing
-- Reproducible demos
-
-Anywhere **data stability matters more than realism**.
-
+Check out the [documentation](/docs/features-v1.md) on features.
 
 ## Example
 
@@ -89,13 +82,20 @@ Anywhere **data stability matters more than realism**.
 ### Output (guaranteed stable)
 ```json 
 [
-  {"id": 9, "is_active": false},
-  {"id": 45, "is_active": true},
-  {"id": 53, "is_active": false},
-  {"id": 15, "is_active": false},
-  {"id": 42, "is_active": true}
+  {"id": 64, "is_active": true},
+  { "id": 9, "is_active": false},
+  {"id": 20, "is_active": false},
+  {"id": 7, "is_active": false},
+  {"id": 90, "is_active": true}
 ]
 ```
+
+Check out the [documentation](/docs/usage.md) for more details on usage.
+
+
+## API Usage
+
+Check out the [documentation](/docs/api-usage.md) for details on API.
 
 ## Design Principles
 
@@ -103,6 +103,7 @@ Anywhere **data stability matters more than realism**.
 - Each column owns its randomness
 - Explicit generation order
 - Zero implicit shuffling
+- Fail fast on invalid specs
 - Versioned behavior (future-proofing)
 
 This is closer to a compiler than a random generator.
@@ -111,6 +112,15 @@ No shared state.
 No implicit randomness.  
 No surprises.
 
+## Use Cases
+
+- Backend API testing
+- Analytics pipeline testing
+- Contract testing
+- Snapshot testing
+- Reproducible demos
+
+Anywhere **data stability matters more than realism**.
 
 ## What This Is (and Isn’t)
 
@@ -127,9 +137,9 @@ No surprises.
 
 ## Status
 
-Actively built  
-Focused on correctness over features  
-Heavy test coverage
+- Actively built  
+- Focused on correctness over features  
+- Heavy test coverage
 
 
 ## Call to Action
@@ -139,26 +149,3 @@ If you believe **determinism is a feature, not an option**, this tool is for you
 👉 Check out the GitHub repository  
 👉 Read the determinism guarantees  
 👉 Try breaking it (seriously)
-
-
-## 🚀 API Usage
-
-**Base URL**
-```
-https://basalt.bundl-spaces.com/generate
-```
-
-**Method:** `GET`  
-**Rate Limit:** `120 requests per minute per IP`
-
-### 🔄 Example Request
-```http
-POST /generate
-```
-
-### ✅ Example Response
-```json
-{
-  "reason": "This feels like something Future Me would yell at Present Me for agreeing to."
-}
-```
