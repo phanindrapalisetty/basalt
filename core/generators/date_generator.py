@@ -2,8 +2,17 @@ from datetime import datetime, timedelta, date
 from core.random_context import RandomContext
 from typing import List, Optional, Any
 
+
 class DateGenerator:
-    def __init__(self, rows: int, start_date:str, end_date:str, column_name:str, null_ratio: float, rc: RandomContext):
+    def __init__(
+        self,
+        rows: int,
+        start_date: str,
+        end_date: str,
+        column_name: str,
+        null_ratio: float,
+        rc: RandomContext,
+    ):
         self.rows = rows
         self.start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
         self.end_date = datetime.strptime(end_date, "%Y-%m-%d").date()

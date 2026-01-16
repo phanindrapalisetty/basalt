@@ -3,7 +3,10 @@ from core.random_context import RandomContext
 from core.generators.int_generator import IntGenerator
 from core.generators.boolean_generator import BooleanGenerator
 from core.generators.float_generator import FloatGenerator
-from core.generators.string_generator import DistributedStringGenerator, DerivedStringGenerator
+from core.generators.string_generator import (
+    DistributedStringGenerator,
+    DerivedStringGenerator,
+)
 from core.generators.date_generator import DateGenerator
 
 
@@ -114,8 +117,8 @@ def generate_dataset(spec):
                 null_ratio=col.get("null_ratio", 0.0),
                 rc=rc,
             )
-        
-        elif col.get("type") == "date" :
+
+        elif col.get("type") == "date":
             generators[col_name] = DateGenerator(
                 rows=row_count,
                 start_date=col.get("start_date"),

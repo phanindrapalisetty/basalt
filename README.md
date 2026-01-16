@@ -148,9 +148,9 @@ No surprises.
 
 - Backend API testing
 - Analytics pipeline testing
+- Reproducible demos and dashboards
 - Contract testing
 - Snapshot testing
-- Reproducible demos
 
 Anywhere **data stability matters more than realism**.
 

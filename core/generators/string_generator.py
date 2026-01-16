@@ -47,6 +47,7 @@ class DistributedStringGenerator:
         self._index += 1
         return value
 
+
 class DerivedStringGenerator:
     def __init__(self, depends_on: str, template: str):
         self.depends_on = depends_on
