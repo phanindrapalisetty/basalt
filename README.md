@@ -4,10 +4,10 @@ A service that guarantees deterministic output: the same input specification and
 
 This project treats synthetic data as **compiled output**, not random samples. If your tests, pipelines, or analytics depend on **stable data**, this tool is built for you.
 
-> same input schema + same constraints +same seed = **identical output. Always.**
+> same input schema + same constraints +same seed = **identical output. Always[^](#important-note).**
 
 It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
-# Folder Structure
+## Folder Structure
 ```
 basalt/
 ├── api/
@@ -44,7 +44,7 @@ This tool enforces **hard determinism contracts**:
 If any of these break, it’s considered a **bug**, not acceptable behavior.
 
 
-## Features (v1 scope)
+## Features
 
 - Deterministic row generation
 - Supported column types:
@@ -59,7 +59,7 @@ If any of these break, it’s considered a **bug**, not acceptable behavior.
 
 Check out the [documentation](/docs/features-v1.md) on features.
 
-**Important note**
+### Important note
 > Deterministic output is guaranteed for a given input specification and seed within the same engine version.
 Changes to the core generation logic (the engine) may result in different outputs, even when the input spec and seed remain unchanged.
 
