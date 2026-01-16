@@ -101,7 +101,9 @@ Check out the [documentation](/docs/usage.md) for more details on usage.
 
 ## API Usage
 
-Check out the [documentation](/docs/api-usage.md) for details on API. Here isthe  swagger UI for the hosted service: https://basalt.bundl-spaces.com/docs.
+Check out the [documentation](/docs/api-usage.md) for details on API. 
+
+Here is the  swagger UI for the hosted service: https://basalt.bundl-spaces.com/docs.
 
 ## Design Principles
 
