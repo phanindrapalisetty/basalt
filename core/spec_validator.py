@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 
 ALLOWED_TYPES = {"int", "float", "string", "boolean", "date"}
-MAX_ROWS = 100
+MAX_ROWS = 1000
 
 
 class SpecValidatorException(Exception):
