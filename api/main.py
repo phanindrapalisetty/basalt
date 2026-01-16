@@ -17,10 +17,10 @@ async def get_health_status(description="Stay healthy"):
 
 
 @app.post("/generate", description="Get a random test data of your choice")
-async def generate(pay_load: dict):
+async def generate(pay_load:dict):
     try:
         validate = SpecValidator.validate(pay_load)
         output = generate_dataset(pay_load)
-        return JSONResponse(content={"data": output}, status_code=200)
+        return {"statuscode": 200, "data":output}
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
