@@ -1,5 +1,5 @@
 # Basalt
-A service that guarantees deterministic output: the same input specification and seed will always produce identical results. It's for engineers who care about **reproducibility, schema stability, and test reliability**.
+A synthetic data generator that guarantees deterministic output: the same input specification and seed will always produce identical results. It's for engineers who care about **reproducibility, schema stability, and test reliability**.
 
 
 This project treats synthetic data as **compiled output**, not random samples. If your tests, pipelines, or analytics depend on **stable data**, this tool is built for you.
