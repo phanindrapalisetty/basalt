@@ -1,6 +1,7 @@
 from typing import List, Optional
 import random
 
+
 class FloatGenerator:
     def __init__(
         self,
@@ -10,8 +11,7 @@ class FloatGenerator:
         rounding: int,
         null_ratio: float,
         column_name: str,
-        rc, 
-        
+        rc,
     ):
 
         self.rows = rows
@@ -24,11 +24,11 @@ class FloatGenerator:
 
         # IMPORTANT:
         # do NOT use the shared rc directly for shuffling, derive a local rc one: disturbs other generators
-        
+
         self.local_rng = rc.sub_rng(column_name)
         self._sequence = self._build_sequence()
         self._index = 0
-    
+
     def _build_sequence(self) -> List[Optional[float]]:
         null_count = int(self.rows * self.null_ratio)
         value_count = self.rows - null_count
@@ -40,11 +40,10 @@ class FloatGenerator:
 
         seq: List[Optional[float]] = values + [None] * null_count
         self.local_rng.shuffle(seq)
-        
-        return seq 
-    
+
+        return seq
+
     def generate(self, row: dict | None = None) -> bool:
         value = self._sequence[self._index]
         self._index += 1
         return value
-    

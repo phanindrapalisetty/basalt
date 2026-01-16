@@ -1,30 +1,30 @@
-from typing import List, Optional
-import random
+from datetime import datetime, timedelta, date
 from core.random_context import RandomContext
+from typing import List, Optional, Any
 
 
-class IntGenerator:
+class DateGenerator:
     def __init__(
         self,
         rows: int,
-        min_val: int,
-        max_val: int,
-        unique: bool,
-        null_ratio: float,
+        start_date: str,
+        end_date: str,
         column_name: str,
+        null_ratio: float,
         rc: RandomContext,
     ):
-
         self.rows = rows
-        self.min_value = min_val
-        self.max_value = max_val
-        self.unique = unique
+        self.start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        self.end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        self.column_name = column_name
         self.null_ratio = null_ratio
         self.rc = rc
-        self.column_name = column_name
 
         # IMPORTANT:
         # do NOT use the shared rc directly for shuffling, derive a local rc one: disturbs other generators
+
+        self._delta = (self.end_date - self.start_date).days
+        print(self._delta)
 
         self.local_rng = rc.sub_rng(column_name)
         self._sequence = self._build_sequence()
@@ -34,22 +34,16 @@ class IntGenerator:
         null_count = int(self.rows * self.null_ratio)
         value_count = self.rows - null_count
 
-        if self.unique:
-            values = self.local_rng.sample(
-                range(self.min_value, self.max_value + 1), value_count
-            )
-        else:
-            values = [
-                self.local_rng.randint(self.min_value, self.max_value)
-                for _ in range(value_count)
-            ]
+        offset = [self.local_rng.randint(0, self._delta) for _ in range(value_count)]
 
-        seq: List[Optional[int]] = values + [None] * null_count
+        dates = [self.start_date + timedelta(days=offset) for offset in offset]
+
+        seq = dates + [None] * null_count
         self.local_rng.shuffle(seq)
 
         return seq
 
     def generate(self, row: dict | None = None) -> bool:
-        value = self._sequence[self._index]
+        value = self._sequence[self._index].isoformat()
         self._index += 1
         return value

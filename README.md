@@ -4,7 +4,7 @@ A service that guarantees deterministic output: the same input specification and
 
 This project treats synthetic data as **compiled output**, not random samples. If your tests, pipelines, or analytics depend on **stable data**, this tool is built for you.
 
-> same input schema + same constraints +same seed = **identical output. Always[^](#important-note).**
+> same input schema + same constraints +same seed = **identical output. Always.**[^](#important-note)
 
 It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
 ## Folder Structure
@@ -110,6 +110,34 @@ Check out the [documentation](/docs/api-usage.md) for details on API.
 - Zero implicit shuffling
 - Fail fast on invalid specs
 
+**High Level Design**
+```markdown
+HTTP POST /generate
+        |
+        v
++----------------------+
+| Spec Validator       |
++----------------------+
+        |
+        v
++----------------------+
+| RandomContext (seed) |
++----------------------+
+        |
+        v
++----------------------+
+| Dataset Generator    |
++----------------------+
+        |
+        v
++----------------------+
+| JSON Serializer      |
++----------------------+
+        |
+        v
+HTTP 200 (JSON array)
+```
+
 This is closer to a compiler than a random generator.
 
 No shared state.  
@@ -120,9 +148,9 @@ No surprises.
 
 - Backend API testing
 - Analytics pipeline testing
+- Reproducible demos and dashboards
 - Contract testing
 - Snapshot testing
-- Reproducible demos
 
 Anywhere **data stability matters more than realism**.
 
@@ -154,3 +182,7 @@ If you believe **determinism is a feature, not an option**, this tool is for you
 👉 Check out the GitHub repository  
 👉 Read the determinism guarantees  
 👉 Try breaking it (seriously)
+
+**Shoutout to**
+- [black](https://pypi.org/project/black/) module for formatting the code.
+- [hotheadhacker](https://github.com/hotheadhacker/no-as-a-service) for inspiration.

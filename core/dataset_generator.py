@@ -1,22 +1,26 @@
+from core.spec_validator import SpecValidatorException
 from core.random_context import RandomContext
 from core.generators.int_generator import IntGenerator
 from core.generators.boolean_generator import BooleanGenerator
 from core.generators.float_generator import FloatGenerator
-from core.spec_validator import SpecValidatorException
-from core.generators.derived_generator import DerivedStringGenerator
+from core.generators.string_generator import (
+    DistributedStringGenerator,
+    DerivedStringGenerator,
+)
+from core.generators.date_generator import DateGenerator
+
 
 def validate_dependencies(graph: dict[str, set[str]]) -> None:
     for col, deps in graph.items():
         if col in deps:
-            raise SpecValidatorException(
-                f"Column '{col}' cannot depend on itself"
-            )
+            raise SpecValidatorException(f"Column '{col}' cannot depend on itself")
 
         for dep in deps:
             if dep not in graph:
                 raise SpecValidatorException(
                     f"Column '{col}' depends on unknown column '{dep}'"
                 )
+
 
 def build_dependency_graph(columns: dict) -> dict[str, set[str]]:
     graph = {}
@@ -60,7 +64,6 @@ def generate_dataset(spec):
     row_count = spec.get("rows")
 
     # deterministic column order
-    # ordered_columns = sorted(spec.get("columns").keys())
     graph = build_dependency_graph(spec["columns"])
     ordered_columns = topological_sort(graph)
 
@@ -85,9 +88,9 @@ def generate_dataset(spec):
                 true_ratio=col.get("true_ratio"),
                 null_ratio=col.get("null_ratio", 0.0),
                 column_name=col_name,
-                rc=rc
+                rc=rc,
             )
-        
+
         elif col.get("type") == "float":
             generators[col_name] = FloatGenerator(
                 rows=row_count,
@@ -98,14 +101,33 @@ def generate_dataset(spec):
                 column_name=col_name,
                 rc=rc,
             )
-        
+
         elif col.get("type") == "string" and col.get("depends_on") is not None:
             generators[col_name] = DerivedStringGenerator(
                 depends_on=col.get("depends_on"),
                 template=col.get("template"),
-                
             )
-        
+
+        elif col.get("type") == "string" and col.get("values") is not None:
+            generators[col_name] = DistributedStringGenerator(
+                rows=row_count,
+                values=col.get("values"),
+                distribution=col.get("distribution"),
+                column_name=col_name,
+                null_ratio=col.get("null_ratio", 0.0),
+                rc=rc,
+            )
+
+        elif col.get("type") == "date":
+            generators[col_name] = DateGenerator(
+                rows=row_count,
+                start_date=col.get("start_date"),
+                end_date=col.get("end_date"),
+                column_name=col_name,
+                null_ratio=col.get("null_ratio", 0.0),
+                rc=rc,
+            )
+
         else:
             raise ValueError(f"Unsupported column type: {col.get('type')}")
 

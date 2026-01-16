@@ -71,11 +71,7 @@ class SpecValidator:
         null_ratio = spec.get("null_ratio", 0.0)
         unique = spec.get("unique", False)
 
-        if (
-            not isinstance(null_ratio, float)
-            or null_ratio < 0.0
-            or null_ratio > 1.0
-        ):
+        if not isinstance(null_ratio, float) or null_ratio < 0.0 or null_ratio > 1.0:
             raise SpecValidatorException(
                 f"Column '{name}': 'null_ratio' must be a float between 0 and 1"
             )
@@ -85,7 +81,7 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'unique' cannot be True if 'null_ratio' > 0.0"
             )
-        
+
         if null_ratio != 0.0:
             SpecValidator._validate_null_ratio(name, null_ratio, rows)
 
@@ -111,14 +107,29 @@ class SpecValidator:
         null_ratio = spec.get("null_ratio", 0.0)
 
         if values is not None:
-            SpecValidator._validate_values(name, values, col_type, distribution, unique, rows)
+            SpecValidator._validate_values(
+                name, values, col_type, distribution, unique, rows
+            )
             SpecValidator._validate_distribution(name, distribution, null_ratio, rows)
+            if depends_on is not None:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'depends_on' cannot be specified if 'values' is specified"
+                )
         elif depends_on is not None:
-            pass 
+            if values is not None:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'values' cannot be specified if 'depends_on' is specified"
+                )
+
+            if not isinstance(depends_on, str):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'depends_on' must be a string"
+                )
         else:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' or 'depends_on' must be specified for string type"
             )
+        pass
 
     @staticmethod
     def _validate_int_column(
@@ -148,7 +159,7 @@ class SpecValidator:
     ) -> None:
         min_val = spec.get("min")
         max_val = spec.get("max")
-        
+
         if min_val > max_val:
             raise SpecValidatorException(
                 f"Column '{name}': 'min' must be less than or equal to 'max'"
@@ -173,17 +184,17 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'true_ratio' must be a float"
             )
-        
+
         if true_ratio < 0 or true_ratio > 1:
             raise SpecValidatorException(
                 f"Column '{name}': 'true_ratio' must be between 0 and 1"
             )
-        
+
         if not (rows * true_ratio).is_integer():
             raise SpecValidatorException(
                 f"Column '{name}': 'true_ratio' cannot be realized"
             )
-        
+
         if true_ratio + null_ratio > 1:
             raise SpecValidatorException(
                 f"Column '{name}': 'true_ratio' + 'null_ratio' must be <= 1"
@@ -193,19 +204,21 @@ class SpecValidator:
     def _validate_date_column(
         name: str, spec: Dict[str, Any], col_type: str, rows: int, unique: bool
     ) -> None:
-        start = spec.get("start")
-        end = spec.get("end")
+        start_date = spec.get("start_date")
+        end_date = spec.get("end_date")
 
-        if not isinstance(start, str) or not isinstance(end, str):
+        if not isinstance(start_date, str) or not isinstance(end_date, str):
             raise SpecValidatorException(
                 f"Column '{name}': date columns require 'start' and 'end' (ISO strings)"
             )
 
     @staticmethod
-    def _validate_distribution(name: str, distribution, null_ratio:float, rows: int) -> None:
+    def _validate_distribution(
+        name: str, distribution, null_ratio: float, rows: int
+    ) -> None:
         if isinstance(distribution, list):
             for p in distribution:
-                expected = rows*p
+                expected = rows * p
                 if not isinstance(p, float):
                     raise SpecValidatorException(
                         f"Column '{name}': 'distribution' must be a list of floats"
@@ -218,15 +231,17 @@ class SpecValidator:
                 raise SpecValidatorException(
                     f"Column '{name}': 'distribution' and/or 'null_ratio' must sum to 1.0"
                 )
-                
+
             # Sanity Check
-            total = sum([int(rows*p) for p in distribution])
+            total = sum([int(rows * p) for p in distribution]) + int(rows * null_ratio)
             if total != rows:
                 raise SpecValidatorException(
                     f"Column '{name}': 'distribution' does not sum to 'rows'"
                 )
-        elif (isinstance(distribution, str) and distribution == "uniform") or distribution is None:
-            # pass 
+        elif (
+            isinstance(distribution, str) and distribution == "uniform"
+        ) or distribution is None:
+            # pass
             raise SpecValidatorException(
                 f"Column '{name}': 'distribution' must be a list of floats and not a string"
             )
@@ -247,7 +262,7 @@ class SpecValidator:
     ) -> None:
         if not values or len(values) == 0:
             raise SpecValidatorException(f"Column '{name}': 'values' must be non-empty")
-        
+
         if not isinstance(values, list):
             raise SpecValidatorException(f"Column '{name}': 'values' must be a list")
         if not distribution:
@@ -275,7 +290,7 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' and 'distribution' must have the same length"
             )
-        
+
     @staticmethod
     def _validate_null_ratio(name: str, null_ratio: float, rows: int) -> None:
         if not isinstance(null_ratio, float):
@@ -286,7 +301,7 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'null_ratio' must be between 0.0 and 1.0"
             )
-        
+
         if not (rows * null_ratio).is_integer():
             raise SpecValidatorException(
                 f"Column '{name}': 'null_ratio: {null_ratio}' for {rows} rows cannot be realized"
