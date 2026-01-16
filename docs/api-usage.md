@@ -4,12 +4,10 @@
 ```url
 https://basalt.bundl-spaces.com
 ```
-or (if you started the server locally)
+or (if the server is started locally)
 ```url
 http://localhost:8000
 ```
-
-**Rate Limit:** `120 requests per minute per IP`
 
 ## Endpoints
 
@@ -38,7 +36,7 @@ Content-Type: application/json
   }
 }
 ```
-**cURL Example**
+**CURL Example**
 ```bash 
 curl -X 'POST' \
   '{BASE URL}/generate' \

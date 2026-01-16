@@ -59,6 +59,10 @@ If any of these break, it’s considered a **bug**, not acceptable behavior.
 
 Check out the [documentation](/docs/features-v1.md) on features.
 
+**Important note**
+> Deterministic output is guaranteed for a given input specification and seed within the same engine version.
+Changes to the core generation logic (the engine) may result in different outputs, even when the input spec and seed remain unchanged.
+
 ## Example
 
 ### Input schema
@@ -105,7 +109,6 @@ Check out the [documentation](/docs/api-usage.md) for details on API.
 - Explicit generation order
 - Zero implicit shuffling
 - Fail fast on invalid specs
-- Versioned behavior (future-proofing)
 
 This is closer to a compiler than a random generator.
 
@@ -141,6 +144,7 @@ Anywhere **data stability matters more than realism**.
 - Actively built  
 - Focused on correctness over features  
 - Heavy test coverage
+- A rate limiter is expected in future which limits `10 requests per minute per IP`, yes I'm poor..
 
 
 ## Call to Action
