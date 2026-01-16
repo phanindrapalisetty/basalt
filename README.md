@@ -182,3 +182,7 @@ If you believe **determinism is a feature, not an option**, this tool is for you
 👉 Check out the GitHub repository  
 👉 Read the determinism guarantees  
 👉 Try breaking it (seriously)
+
+**Shoutout to**
+- [black](https://pypi.org/project/black/) module for formatting the code.
+- [hotheadhacker](https://github.com/hotheadhacker/no-as-a-service) for inspiration.
