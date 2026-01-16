@@ -36,16 +36,15 @@ class DistributedStringGenerator:
         for i in range(0, _range):
             print(self.values[i])
             seq += [self.values[i]] * int(self.distribution[i] * self.rows)
-        
+
         seq += [None] * null_count
         print(seq)
 
         self.local_rng.shuffle(seq)
 
         return seq
-        
+
     def generate(self, row: dict | None = None) -> bool:
         value = self._sequence[self._index]
         self._index += 1
         return value
-

@@ -1,6 +1,7 @@
 import random
 import hashlib
 
+
 class RandomContext:
     def __init__(self, seed: int):
         self.seed = seed
