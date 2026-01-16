@@ -204,10 +204,10 @@ class SpecValidator:
     def _validate_date_column(
         name: str, spec: Dict[str, Any], col_type: str, rows: int, unique: bool
     ) -> None:
-        start = spec.get("start")
-        end = spec.get("end")
+        start_date = spec.get("start_date")
+        end_date = spec.get("end_date")
 
-        if not isinstance(start, str) or not isinstance(end, str):
+        if not isinstance(start_date, str) or not isinstance(end_date, str):
             raise SpecValidatorException(
                 f"Column '{name}': date columns require 'start' and 'end' (ISO strings)"
             )

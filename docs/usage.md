@@ -115,8 +115,8 @@
 "columns": {
     "date_of_birth": {
         "type": "date",
-        "min_date": "1990-01-01",
-        "max_date": "2000-12-31",
+        "start_date": "1990-01-01",
+        "end_date": "2000-12-31",
         "null_ratio": 0.1
     }
 }
