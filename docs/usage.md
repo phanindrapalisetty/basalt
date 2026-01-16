@@ -89,3 +89,39 @@
     }
 }
 ```
+
+`string`: distribution type
+
+- `values` categorical values which are to be. Must contain at least one value. Values are used exactly as provided. This is a mandatory field.
+- `distribution` controls how string values are distributed across rows. Should be a list of floats between 0 to 1. The sum of distribution is to be summed to 1 including `null_ratio`. This is a mandatory field.
+- `null_ratio` is optional, should be a float between 0 and 1.
+
+```json
+"columns": {
+    "gender": {
+        "type": "string",
+        "values": ["male", "female"],
+        "distribution": [0.4, 0.4],
+        "null_ratio": 0.2
+    }
+}
+```
+
+`date`
+- `min_date` and `max_date` are mandatory and are of type string. The format is `YYYY-MM-DD`.
+- `null_ratio` is optional, should be a float between 0 and 1.
+```json
+"columns": {
+    "date_of_birth": {
+        "type": "date",
+        "min_date": "1990-01-01",
+        "max_date": "2000-12-31",
+        "null_ratio": 0.1
+    }
+}
+```
+
+### Note
+- `null_ratio` is only realised only when `unique` is not set to true.
+- Any of the ratios `null_ratio`, `true_ratio`, `distribution` can be only realised only when the rows can be realised. That means, the multiplication of any `ratio` and `rows` should be an integer. Rounding of cannot be achieved as it affects determinism. If the ratio cannot be realised, an error will be thrown.
+- Currently `string` whcih has `depends_on` is supported for only one independent column. It can be further extended to support multiple columns.

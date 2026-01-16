@@ -17,12 +17,13 @@ basalt/
 │   ├── random_context.py
 │   ├── dataset_generator.py
 │   └── generators
-|       ├── int_generator.py
+│       ├── int_generator.py
 │       ├── boolean_generator.py
 │       ├── float_generator.py
 │       └── derived_generator.py
 ├── tests/
 │   └── golden/
+├── docs/
 ├── Dockerfile
 ├── README.md
 ├── LICENSE
@@ -56,16 +57,6 @@ If any of these break, it’s considered a **bug**, not acceptable behavior.
 - Per-column random generators
 
 Check out the [documentation](/docs/features-v1.md) on features.
-
-## Use Cases
-
-- Backend API testing
-- Analytics pipeline testing
-- Contract testing
-- Snapshot testing
-- Reproducible demos
-
-Anywhere **data stability matters more than realism**.
 
 ## Example
 
@@ -120,6 +111,16 @@ This is closer to a compiler than a random generator.
 No shared state.  
 No implicit randomness.  
 No surprises.
+
+## Use Cases
+
+- Backend API testing
+- Analytics pipeline testing
+- Contract testing
+- Snapshot testing
+- Reproducible demos
+
+Anywhere **data stability matters more than realism**.
 
 ## What This Is (and Isn’t)
 
