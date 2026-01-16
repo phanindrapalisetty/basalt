@@ -7,6 +7,9 @@ This project treats synthetic data as **compiled output**, not random samples. I
 > same input schema + same constraints +same seed = **identical output. Always.**[^](#important-note)
 
 It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
+
+Checkout the swagger UI at https://basalt.bundl-spaces.com/docs.
+
 ## Folder Structure
 ```
 basalt/
