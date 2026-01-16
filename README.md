@@ -138,12 +138,6 @@ HTTP POST /generate
 HTTP 200 (JSON array)
 ```
 
-This is closer to a compiler than a random generator.
-
-No shared state.  
-No implicit randomness.  
-No surprises.
-
 ## Use Cases
 
 - Backend API testing
