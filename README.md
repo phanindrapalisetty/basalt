@@ -8,8 +8,6 @@ This project treats synthetic data as **compiled output**, not random samples. I
 
 It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
 
-Checkout the swagger UI at https://basalt.bundl-spaces.com/docs.
-
 ## Folder Structure
 ```
 basalt/
@@ -103,7 +101,7 @@ Check out the [documentation](/docs/usage.md) for more details on usage.
 
 ## API Usage
 
-Check out the [documentation](/docs/api-usage.md) for details on API.
+Check out the [documentation](/docs/api-usage.md) for details on API. Here isthe  swagger UI for the hosted service: https://basalt.bundl-spaces.com/docs.
 
 ## Design Principles
 
