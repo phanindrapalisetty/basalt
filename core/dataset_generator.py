@@ -114,6 +114,16 @@ def generate_dataset(spec):
                 null_ratio=col.get("null_ratio", 0.0),
                 rc=rc,
             )
+        
+        elif col.get("type") == "date" :
+            generators[col_name] = DateGenerator(
+                rows=row_count,
+                start_date=col.get("start_date"),
+                end_date=col.get("end_date"),
+                column_name=col_name,
+                null_ratio=col.get("null_ratio", 0.0),
+                rc=rc,
+            )
 
         else:
             raise ValueError(f"Unsupported column type: {col.get('type')}")

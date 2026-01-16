@@ -34,11 +34,9 @@ class DistributedStringGenerator:
         _range = len(self.values)
         seq = []
         for i in range(0, _range):
-            print(self.values[i])
             seq += [self.values[i]] * int(self.distribution[i] * self.rows)
 
         seq += [None] * null_count
-        print(seq)
 
         self.local_rng.shuffle(seq)
 
