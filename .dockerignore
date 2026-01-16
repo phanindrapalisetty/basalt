@@ -1,0 +1,25 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtual envs
+.venv/
+venv/
+
+# Test & tooling artifacts
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore
+
+# OS junk
+.DS_Store
+
+# Test File
+test_sample.py
+docs/ignored_doc.md
