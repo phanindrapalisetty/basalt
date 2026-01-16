@@ -5,7 +5,7 @@ import json
 from core.spec_validator import SpecValidator, SpecValidatorException
 from core.dataset_generator import generate_dataset
 
-app = FastAPI()
+app = FastAPI(title="Basalt", version="1.0.0")
 
 
 @app.get("/health")
