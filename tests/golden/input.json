@@ -1,0 +1,56 @@
+{
+    "rows": 10,
+    "seed": 50,
+    "columns":
+    {
+        "id":
+        {
+            "type": "int",
+            "min": 1,
+            "max": 100,
+            "unique": true
+        },
+        "is_active":
+        {
+            "type": "boolean",
+            "true_ratio": 0.4,
+            "null_ratio": 0.2
+        },
+        "id_float":
+        {
+            "type": "float",
+            "min": 1.0,
+            "max": 100.0,
+            "null_ratio": 0.2
+        },
+        "string_derived":
+        {
+            "type": "string",
+            "depends_on": "id",
+            "template": "value_{value}@gmail.com"
+        },
+        "string_dist":
+        {
+            "type": "string",
+            "values":
+            [
+                "US",
+                "UK",
+                "CA"
+            ],
+            "distribution":
+            [
+                0.5,
+                0.3,
+                0.1
+            ],
+            "null_ratio": 0.1
+        },
+        "created_date":
+        {
+            "type": "date",
+            "start_date": "2023-01-01",
+            "end_date": "2023-12-31"
+        }
+    }
+}

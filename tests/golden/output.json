@@ -1,0 +1,82 @@
+[
+      {
+        "created_date": "2023-04-15",
+        "id": 23,
+        "id_float": 19.313845,
+        "is_active": null,
+        "string_derived": "value_23@gmail.com",
+        "string_dist": "CA"
+      },
+      {
+        "created_date": "2023-07-26",
+        "id": 77,
+        "id_float": 83.347424,
+        "is_active": true,
+        "string_derived": "value_77@gmail.com",
+        "string_dist": "US"
+      },
+      {
+        "created_date": "2023-07-09",
+        "id": 50,
+        "id_float": 5.556629,
+        "is_active": false,
+        "string_derived": "value_50@gmail.com",
+        "string_dist": "UK"
+      },
+      {
+        "created_date": "2023-11-12",
+        "id": 55,
+        "id_float": null,
+        "is_active": false,
+        "string_derived": "value_55@gmail.com",
+        "string_dist": "UK"
+      },
+      {
+        "created_date": "2023-08-13",
+        "id": 4,
+        "id_float": 98.203265,
+        "is_active": false,
+        "string_derived": "value_4@gmail.com",
+        "string_dist": null
+      },
+      {
+        "created_date": "2023-12-27",
+        "id": 70,
+        "id_float": 42.051836,
+        "is_active": true,
+        "string_derived": "value_70@gmail.com",
+        "string_dist": "US"
+      },
+      {
+        "created_date": "2023-04-22",
+        "id": 40,
+        "id_float": 99.978692,
+        "is_active": true,
+        "string_derived": "value_40@gmail.com",
+        "string_dist": "US"
+      },
+      {
+        "created_date": "2023-06-11",
+        "id": 26,
+        "id_float": 22.779001,
+        "is_active": false,
+        "string_derived": "value_26@gmail.com",
+        "string_dist": "UK"
+      },
+      {
+        "created_date": "2023-07-04",
+        "id": 67,
+        "id_float": null,
+        "is_active": true,
+        "string_derived": "value_67@gmail.com",
+        "string_dist": "US"
+      },
+      {
+        "created_date": "2023-01-04",
+        "id": 19,
+        "id_float": 40.770892,
+        "is_active": null,
+        "string_derived": "value_19@gmail.com",
+        "string_dist": "US"
+      }
+    ]

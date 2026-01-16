@@ -208,5 +208,5 @@ __marimo__/
 
 
 # Test File
-tests/test_sample.py
+test_sample.py
 docs/ignored_doc.md
