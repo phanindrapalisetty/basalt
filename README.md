@@ -57,7 +57,7 @@ If any of these break, it’s considered a **bug**, not acceptable behavior.
 - Fully seed-controlled output
 - Per-column random generators
 
-Check out the [documentation](/docs/features-v1.md) on features.
+Check out the [documentation](/docs/features.md) on features.
 
 ### Important note
 > Deterministic output is guaranteed for a given input specification and seed within the same engine version.
