@@ -82,11 +82,11 @@ Check out the [documentation](/docs/features-v1.md) on features.
 ### Output (guaranteed stable)
 ```json 
 [
-  {"id": 9, "is_active": false},
-  {"id": 45, "is_active": true},
-  {"id": 53, "is_active": false},
-  {"id": 15, "is_active": false},
-  {"id": 42, "is_active": true}
+  {"id": 64, "is_active": true},
+  { "id": 9, "is_active": false},
+  {"id": 20, "is_active": false},
+  {"id": 7, "is_active": false},
+  {"id": 90, "is_active": true}
 ]
 ```
 
