@@ -113,12 +113,25 @@ class SpecValidator:
         if values is not None:
             SpecValidator._validate_values(name, values, col_type, distribution, unique, rows)
             SpecValidator._validate_distribution(name, distribution, null_ratio, rows)
+            if depends_on is not None:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'depends_on' cannot be specified if 'values' is specified"
+                )
         elif depends_on is not None:
-            pass 
+            if values is not None:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'values' cannot be specified if 'depends_on' is specified"
+                )
+            
+            if not isinstance(depends_on, str):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'depends_on' must be a string"
+                )
         else:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' or 'depends_on' must be specified for string type"
             )
+        pass
 
     @staticmethod
     def _validate_int_column(
@@ -220,7 +233,7 @@ class SpecValidator:
                 )
                 
             # Sanity Check
-            total = sum([int(rows*p) for p in distribution])
+            total = sum([int(rows*p) for p in distribution]) + int(rows*null_ratio)
             if total != rows:
                 raise SpecValidatorException(
                     f"Column '{name}': 'distribution' does not sum to 'rows'"

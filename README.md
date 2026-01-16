@@ -4,7 +4,7 @@ A service that guarantees deterministic output: the same input specification and
 
 This project treats synthetic data as **compiled output**, not random samples. If your tests, pipelines, or analytics depend on **stable data**, this tool is built for you.
 
-> same input schema + same constraints +same seed = **identical output. Always[^](#important-note).**
+> same input schema + same constraints +same seed = **identical output. Always.**[^](#important-note)
 
 It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
 ## Folder Structure
@@ -109,6 +109,34 @@ Check out the [documentation](/docs/api-usage.md) for details on API.
 - Explicit generation order
 - Zero implicit shuffling
 - Fail fast on invalid specs
+
+**High Level Design**
+```markdown
+HTTP POST /generate
+        |
+        v
++----------------------+
+| Spec Validator       |
++----------------------+
+        |
+        v
++----------------------+
+| RandomContext (seed) |
++----------------------+
+        |
+        v
++----------------------+
+| Dataset Generator    |
++----------------------+
+        |
+        v
++----------------------+
+| JSON Serializer      |
++----------------------+
+        |
+        v
+HTTP 200 (JSON array)
+```
 
 This is closer to a compiler than a random generator.
 

@@ -1,3 +1,4 @@
+# core/generators/float_generator.py
 from typing import List, Optional
 import random
 

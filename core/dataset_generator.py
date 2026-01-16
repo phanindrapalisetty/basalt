@@ -4,6 +4,7 @@ from core.generators.boolean_generator import BooleanGenerator
 from core.generators.float_generator import FloatGenerator
 from core.spec_validator import SpecValidatorException
 from core.generators.derived_generator import DerivedStringGenerator
+from core.generators.string_generator import DistributedStringGenerator
 
 def validate_dependencies(graph: dict[str, set[str]]) -> None:
     for col, deps in graph.items():
@@ -60,7 +61,6 @@ def generate_dataset(spec):
     row_count = spec.get("rows")
 
     # deterministic column order
-    # ordered_columns = sorted(spec.get("columns").keys())
     graph = build_dependency_graph(spec["columns"])
     ordered_columns = topological_sort(graph)
 
@@ -104,6 +104,16 @@ def generate_dataset(spec):
                 depends_on=col.get("depends_on"),
                 template=col.get("template"),
                 
+            )
+
+        elif col.get("type") == "string" and col.get("values") is not None:
+            generators[col_name] = DistributedStringGenerator(
+                rows=row_count,
+                values=col.get("values"),
+                distribution=col.get("distribution"),
+                column_name=col_name,
+                null_ratio=col.get("null_ratio", 0.0),
+                rc=rc,
             )
         
         else:

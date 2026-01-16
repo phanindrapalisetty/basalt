@@ -58,7 +58,6 @@ curl -X 'POST' \
 **Response**
 ```json 
 {
-  "statuscode": 200,
   "data": [
     {
       "client_id": 1474
@@ -98,6 +97,6 @@ Content-Type: application/json
 **Response**
 ```json 
 {
-  "error": "Column 'client_id' has invalid type 'int1'"
+  "error": "Column 'person': 'values' or 'depends_on' must be specified for string type"
 }
 ```
