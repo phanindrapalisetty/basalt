@@ -77,7 +77,7 @@ class SpecValidator:
             )
         if not isinstance(unique, bool):
             raise SpecValidatorException(f"Column '{name}': 'unique' must be boolean")
-        if unique and null_ratio > 0.0:
+        if unique is True and null_ratio > 0.0:
             raise SpecValidatorException(
                 f"Column '{name}': 'unique' cannot be True if 'null_ratio' > 0.0"
             )
@@ -148,7 +148,7 @@ class SpecValidator:
                 f"Column '{name}': 'min' and 'max' must be integers"
             )
 
-        if unique and (max_val - min_val + 1) < rows:
+        if unique is True and (max_val - min_val + 1) < rows:
             raise SpecValidatorException(
                 f"Column '{name}': 'unique' cannot be True if 'max' - 'min' + 1 < rows"
             )
@@ -170,7 +170,7 @@ class SpecValidator:
                 f"Column '{name}': 'min' and 'max' must be floats"
             )
 
-        if unique:
+        if unique is True:
             raise SpecValidatorException(
                 f"Column '{name}': 'unique' cannot be relaised for a float type"
             )
@@ -269,7 +269,7 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' must have a 'distribution'"
             )
-        if unique:
+        if unique is True:
             raise SpecValidatorException(
                 f"Column '{name}': 'unique' is not supported for 'values'"
             )
