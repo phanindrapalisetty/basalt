@@ -6,7 +6,7 @@ This project treats synthetic data as **compiled output**, not random samples. I
 
 > same input schema + same constraints +same seed = **identical output. Always.**[^](#important-note)
 
-It's lightweight, simple and boringly written. Want to self-host? Head over [here](docs/hosting.md) to explore more. 
+It's lightweight, simple and boringly written. 
 
 ## Folder Structure
 ```
@@ -104,6 +104,8 @@ Check out the [documentation](/docs/usage.md) for more details on usage.
 Check out the [documentation](/docs/api-usage.md) for details on API. 
 
 Here is the  swagger UI for the hosted service: https://basalt.bundl-spaces.com/docs.
+Would like to self-host? Head over [here](docs/hosting.md) to explore more. 
+This [medium article](https://medium.com/@phanindra-palisetty/deploying-a-public-fastapi-on-aws-lambda-using-ecr-and-api-gateway-aaceeaccd04e) can help in deploying to AWS Lambda via API Gateway with predictable costs and minimal operational overhead. 
 
 ## Design Principles
 

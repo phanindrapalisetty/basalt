@@ -58,3 +58,5 @@ docker run --rm -it -p 8000:8000/tcp basalt:latest
 ```
 
 The API will be available at http://localhost:8000. You can have the Swagger UI at http://localhost:8000/docs.
+
+This [medium article](https://medium.com/@phanindra-palisetty/deploying-a-public-fastapi-on-aws-lambda-using-ecr-and-api-gateway-aaceeaccd04e) can help in deploying to AWS Lambda via API Gateway with predictable costs and minimal operational overhead. 
