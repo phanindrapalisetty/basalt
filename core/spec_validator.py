@@ -15,6 +15,37 @@ class SpecValidator:
         SpecValidator._validate_columns(spec["columns"], spec["rows"])
 
     @staticmethod
+    def validate_multi(spec: Dict[str, Any]) -> None:
+        if not isinstance(spec, dict):
+            raise SpecValidatorException("Spec must be a JSON object")
+
+        seed = spec.get("seed")
+        if seed is None:
+            raise SpecValidatorException("'seed' is required")
+        if not isinstance(seed, int):
+            raise SpecValidatorException("'seed' must be an integer")
+        if seed > 2**32 - 1 or seed < -(2**16) + 1:
+            raise SpecValidatorException("'seed' must be less than 2^32 - 1 or more than -2^16 + 1")
+
+        datasets = spec.get("datasets")
+        if not datasets or not isinstance(datasets, list) or len(datasets) == 0:
+            raise SpecValidatorException("'datasets' must be a non-empty array")
+
+        seen_names = set()
+        for i, dataset in enumerate(datasets):
+            if not isinstance(dataset, dict):
+                raise SpecValidatorException(f"Dataset at index {i} must be a JSON object")
+
+            name = dataset.get("name")
+            if not isinstance(name, str) or not name:
+                raise SpecValidatorException(f"Dataset at index {i}: 'name' must be a non-empty string")
+            if name in seen_names:
+                raise SpecValidatorException(f"Duplicate dataset name '{name}'")
+            seen_names.add(name)
+
+            SpecValidator.validate({**dataset, "seed": seed})
+
+    @staticmethod
     def _validate_top_level(spec: Dict[str, Any]) -> None:
         if not isinstance(spec, dict):
             raise SpecValidatorException("Spec must be a JSON object")

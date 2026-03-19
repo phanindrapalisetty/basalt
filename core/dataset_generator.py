@@ -1,3 +1,5 @@
+import hashlib
+
 from core.spec_validator import SpecValidatorException
 from core.random_context import RandomContext
 from core.generators.int_generator import IntGenerator
@@ -140,3 +142,21 @@ def generate_dataset(spec):
         rows.append(row)
 
     return rows
+
+
+def _derive_dataset_seed(global_seed: int, dataset_name: str) -> int:
+    key = f"{global_seed}:{dataset_name}".encode()
+    return int(hashlib.sha256(key).hexdigest(), 16) % (2**32)
+
+
+def generate_multi_dataset(spec: dict) -> dict:
+    global_seed = spec.get("seed")
+
+    result = {}
+    for dataset in spec.get("datasets"):
+        name = dataset["name"]
+        derived_seed = _derive_dataset_seed(global_seed, name)
+        dataset_spec = {**dataset, "seed": derived_seed}
+        result[name] = generate_dataset(dataset_spec)
+
+    return result
