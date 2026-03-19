@@ -37,10 +37,12 @@ class SpecValidator:
 
         # seed
         seed = spec.get("seed")
-        if not seed:
+        if seed is None:
             raise SpecValidatorException("'seed' is required")
         if seed is not None and not isinstance(seed, int):
             raise SpecValidatorException("'seed' must be an integer, and is required")
+        if seed > 2**32 - 1 or seed < -2**16+1:
+            raise SpecValidatorException("'seed' must be less than 2^32 - 1 or more than -2**16+1")
 
     @staticmethod
     def _validate_columns(columns: Dict[str, Any], rows: int) -> None:
@@ -125,6 +127,12 @@ class SpecValidator:
                 raise SpecValidatorException(
                     f"Column '{name}': 'depends_on' must be a string"
                 )
+
+            template = spec.get("template")
+            if not isinstance(template, str):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'template' must be a string when 'depends_on' is specified"
+                )
         else:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' or 'depends_on' must be specified for string type"
@@ -138,14 +146,14 @@ class SpecValidator:
         min_val = spec.get("min")
         max_val = spec.get("max")
 
-        if min_val > max_val:
-            raise SpecValidatorException(
-                f"Column '{name}': 'min' must be less than or equal to 'max'"
-            )
-
         if not isinstance(min_val, int) or not isinstance(max_val, int):
             raise SpecValidatorException(
                 f"Column '{name}': 'min' and 'max' must be integers"
+            )
+
+        if min_val > max_val:
+            raise SpecValidatorException(
+                f"Column '{name}': 'min' must be less than or equal to 'max'"
             )
 
         if unique is True and (max_val - min_val + 1) < rows:
@@ -209,7 +217,21 @@ class SpecValidator:
 
         if not isinstance(start_date, str) or not isinstance(end_date, str):
             raise SpecValidatorException(
-                f"Column '{name}': date columns require 'start' and 'end' (ISO strings)"
+                f"Column '{name}': date columns require 'start_date' and 'end_date' (ISO strings)"
+            )
+
+        from datetime import datetime
+        try:
+            parsed_start = datetime.strptime(start_date, "%Y-%m-%d").date()
+            parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise SpecValidatorException(
+                f"Column '{name}': 'start_date' and 'end_date' must be valid ISO dates (YYYY-MM-DD)"
+            )
+
+        if parsed_start > parsed_end:
+            raise SpecValidatorException(
+                f"Column '{name}': 'start_date' must be before or equal to 'end_date'"
             )
 
     @staticmethod

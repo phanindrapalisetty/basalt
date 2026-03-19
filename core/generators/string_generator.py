@@ -55,4 +55,4 @@ class DerivedStringGenerator:
 
     def generate(self, row: dict):
         value = row[self.depends_on]
-        return self.template.format(value=value)
+        return None if value is None else self.template.format(value=value)

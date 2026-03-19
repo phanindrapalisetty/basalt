@@ -24,7 +24,6 @@ class DateGenerator:
         # do NOT use the shared rc directly for shuffling, derive a local rc one: disturbs other generators
 
         self._delta = (self.end_date - self.start_date).days
-        print(self._delta)
 
         self.local_rng = rc.sub_rng(column_name)
         self._sequence = self._build_sequence()
@@ -44,6 +43,6 @@ class DateGenerator:
         return seq
 
     def generate(self, row: dict | None = None) -> bool:
-        value = self._sequence[self._index].isoformat()
+        value = self._sequence[self._index]
         self._index += 1
-        return value
+        return value.isoformat() if value is not None else None

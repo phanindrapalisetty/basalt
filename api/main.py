@@ -22,5 +22,7 @@ async def generate(pay_load:dict):
         validate = SpecValidator.validate(pay_load)
         output = generate_dataset(pay_load)
         return JSONResponse(content={"data": output}, status_code=200)
+    except SpecValidatorException as e:
+        return JSONResponse(content={"error": str(e)}, status_code=422)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
