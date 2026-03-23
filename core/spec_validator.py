@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 
-ALLOWED_TYPES = {"int", "float", "string", "boolean", "date"}
+ALLOWED_TYPES = {"int", "float", "string", "boolean", "date", "regex"}
 MAX_ROWS = 1000
 
 
@@ -98,6 +98,8 @@ class SpecValidator:
             SpecValidator._validate_boolean_column(name, spec, rows)
         elif col_type == "date":
             SpecValidator._validate_date_column(name, spec, col_type, rows, unique)
+        elif col_type == "regex":
+            SpecValidator._validate_regex_column(name, spec)
 
     @staticmethod
     def _validate_string_column(
@@ -143,6 +145,29 @@ class SpecValidator:
     def _validate_int_column(
         name: str, spec: Dict[str, Any], col_type: str, rows: int, unique: bool
     ) -> None:
+        sequential = spec.get("sequential", False)
+
+        if sequential:
+            if not isinstance(sequential, bool):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'sequential' must be a boolean"
+                )
+            if spec.get("null_ratio", 0.0) > 0:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'sequential' is incompatible with 'null_ratio' > 0"
+                )
+            start = spec.get("start", 1)
+            step = spec.get("step", 1)
+            if not isinstance(start, int):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'start' must be an integer"
+                )
+            if not isinstance(step, int) or step == 0:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'step' must be a non-zero integer"
+                )
+            return
+
         min_val = spec.get("min")
         max_val = spec.get("max")
 
@@ -311,6 +336,21 @@ class SpecValidator:
         if len(values) != len(distribution):
             raise SpecValidatorException(
                 f"Column '{name}': 'values' and 'distribution' must have the same length"
+            )
+
+    @staticmethod
+    def _validate_regex_column(name: str, spec: Dict[str, Any]) -> None:
+        import re
+        pattern = spec.get("pattern")
+        if not isinstance(pattern, str) or not pattern:
+            raise SpecValidatorException(
+                f"Column '{name}': 'pattern' is required and must be a non-empty string"
+            )
+        try:
+            re.compile(pattern)
+        except re.error as e:
+            raise SpecValidatorException(
+                f"Column '{name}': invalid regex pattern — {e}"
             )
 
     @staticmethod

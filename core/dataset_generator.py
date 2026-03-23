@@ -8,6 +8,8 @@ from core.generators.string_generator import (
     DerivedStringGenerator,
 )
 from core.generators.date_generator import DateGenerator
+from core.generators.sequential_int_generator import SequentialIntGenerator
+from core.generators.regex_generator import RegexGenerator
 
 
 def validate_dependencies(graph: dict[str, set[str]]) -> None:
@@ -71,7 +73,23 @@ def generate_dataset(spec):
 
     for col_name in ordered_columns:
         col = spec.get("columns")[col_name]
-        if col.get("type") == "int":
+        if col.get("type") == "int" and col.get("sequential"):
+            generators[col_name] = SequentialIntGenerator(
+                rows=row_count,
+                start=col.get("start", 1),
+                step=col.get("step", 1),
+            )
+
+        elif col.get("type") == "regex":
+            generators[col_name] = RegexGenerator(
+                rows=row_count,
+                pattern=col.get("pattern"),
+                null_ratio=col.get("null_ratio", 0.0),
+                column_name=col_name,
+                rc=rc,
+            )
+
+        elif col.get("type") == "int":
             generators[col_name] = IntGenerator(
                 rows=row_count,
                 min_val=col.get("min"),
