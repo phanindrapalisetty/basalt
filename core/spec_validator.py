@@ -1,7 +1,9 @@
+import os
 from typing import Dict, Any, List
 
 ALLOWED_TYPES = {"int", "float", "string", "boolean", "date"}
-MAX_ROWS = 1000
+MAX_ROWS = int(os.getenv("MAX_ROWS", 5000))
+MAX_CELLS = int(os.getenv("MAX_CELLS", 1_000_000))
 
 
 class SpecValidatorException(Exception):
@@ -34,6 +36,13 @@ class SpecValidator:
             raise SpecValidatorException("'columns' is required")
         if not isinstance(columns, dict) or not columns:
             raise SpecValidatorException("'columns' must be a non-empty JSON object")
+
+        # cell limit
+        total_cells = rows * len(columns)
+        if total_cells > MAX_CELLS:
+            raise SpecValidatorException(
+                f"Total cells (rows × columns) cannot exceed {MAX_CELLS:,}. Got {total_cells:,}."
+            )
 
         # seed
         seed = spec.get("seed")
