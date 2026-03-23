@@ -87,6 +87,11 @@ class SpecValidator:
         if null_ratio != 0.0:
             SpecValidator._validate_null_ratio(name, null_ratio, rows)
 
+        # conditional columns (map / ranges) bypass normal type validation
+        if "map" in spec or "ranges" in spec:
+            SpecValidator._validate_conditional_column(name, spec)
+            return
+
         # column types validation
         if col_type == "string":
             SpecValidator._validate_string_column(name, spec, col_type, rows, unique)
@@ -312,6 +317,53 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' and 'distribution' must have the same length"
             )
+
+    @staticmethod
+    def _validate_conditional_column(name: str, spec: Dict[str, Any]) -> None:
+        depends_on = spec.get("depends_on")
+        if not isinstance(depends_on, str) or not depends_on:
+            raise SpecValidatorException(
+                f"Column '{name}': conditional columns require 'depends_on'"
+            )
+
+        if "map" in spec and "ranges" in spec:
+            raise SpecValidatorException(
+                f"Column '{name}': cannot specify both 'map' and 'ranges'"
+            )
+
+        if "map" in spec:
+            map_dict = spec["map"]
+            if not isinstance(map_dict, dict) or not map_dict:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'map' must be a non-empty object"
+                )
+            value_types = {type(v) for v in map_dict.values()}
+            if len(value_types) > 1:
+                raise SpecValidatorException(
+                    f"Column '{name}': all values in 'map' must be the same type"
+                )
+
+        elif "ranges" in spec:
+            ranges = spec["ranges"]
+            if not isinstance(ranges, list) or not ranges:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'ranges' must be a non-empty array"
+                )
+            for r in ranges:
+                if not isinstance(r, dict) or "then" not in r:
+                    raise SpecValidatorException(
+                        f"Column '{name}': each range entry must have 'then'"
+                    )
+                lo = r.get("min")
+                hi = r.get("max")
+                if lo is not None and not isinstance(lo, (int, float)):
+                    raise SpecValidatorException(
+                        f"Column '{name}': range 'min' must be a number or null"
+                    )
+                if hi is not None and not isinstance(hi, (int, float)):
+                    raise SpecValidatorException(
+                        f"Column '{name}': range 'max' must be a number or null"
+                    )
 
     @staticmethod
     def _validate_null_ratio(name: str, null_ratio: float, rows: int) -> None:

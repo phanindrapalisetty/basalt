@@ -8,6 +8,7 @@ from core.generators.string_generator import (
     DerivedStringGenerator,
 )
 from core.generators.date_generator import DateGenerator
+from core.generators.conditional_generator import MapGenerator, RangeGenerator
 
 
 def validate_dependencies(graph: dict[str, set[str]]) -> None:
@@ -71,7 +72,21 @@ def generate_dataset(spec):
 
     for col_name in ordered_columns:
         col = spec.get("columns")[col_name]
-        if col.get("type") == "int":
+        if "map" in col:
+            generators[col_name] = MapGenerator(
+                depends_on=col["depends_on"],
+                map_dict=col["map"],
+                default=col.get("default"),
+            )
+
+        elif "ranges" in col:
+            generators[col_name] = RangeGenerator(
+                depends_on=col["depends_on"],
+                ranges=col["ranges"],
+                default=col.get("default"),
+            )
+
+        elif col.get("type") == "int":
             generators[col_name] = IntGenerator(
                 rows=row_count,
                 min_val=col.get("min"),
