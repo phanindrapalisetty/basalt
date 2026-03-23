@@ -238,39 +238,46 @@ class SpecValidator:
     def _validate_distribution(
         name: str, distribution, null_ratio: float, rows: int
     ) -> None:
-        if isinstance(distribution, list):
-            for p in distribution:
-                expected = rows * p
-                if not isinstance(p, float):
-                    raise SpecValidatorException(
-                        f"Column '{name}': 'distribution' must be a list of floats"
-                    )
-                if not expected.is_integer():
-                    raise SpecValidatorException(
-                        f"Column '{name}': 'distribution' {p} cannot be realized"
-                    )
-            if sum(distribution) + null_ratio < 1e-6:
-                raise SpecValidatorException(
-                    f"Column '{name}': 'distribution' and/or 'null_ratio' must sum to 1.0"
-                )
-
-            # Sanity Check
-            total = sum([int(rows * p) for p in distribution]) + int(rows * null_ratio)
-            if total != rows:
-                raise SpecValidatorException(
-                    f"Column '{name}': 'distribution' does not sum to 'rows'"
-                )
-        elif (
-            isinstance(distribution, str) and distribution == "uniform"
-        ) or distribution is None:
-            # pass
+        if not isinstance(distribution, list):
             raise SpecValidatorException(
-                f"Column '{name}': 'distribution' must be a list of floats and not a string"
+                f"Column '{name}': 'distribution' must be a list of floats (ratios) or ints (weights)"
             )
 
-        else:
+        if not distribution:
             raise SpecValidatorException(
-                f"Column '{name}': 'distribution' must be a list of floats or 'uniform'"
+                f"Column '{name}': 'distribution' must not be empty"
+            )
+
+        all_int = all(isinstance(p, int) and not isinstance(p, bool) for p in distribution)
+        all_float = all(isinstance(p, float) for p in distribution)
+
+        if not all_int and not all_float:
+            raise SpecValidatorException(
+                f"Column '{name}': 'distribution' must be all floats (ratios) or all ints (weights), not mixed"
+            )
+
+        if all_int:
+            # Weights mode — each entry is a relative count; must be positive
+            for w in distribution:
+                if w <= 0:
+                    raise SpecValidatorException(
+                        f"Column '{name}': 'distribution' weights must be positive integers, got {w}"
+                    )
+            # Weights are normalized at generation time; no further checks needed
+            return
+
+        # Ratios mode (all float) — existing strict checks
+        for p in distribution:
+            expected = rows * p
+            if not expected.is_integer():
+                raise SpecValidatorException(
+                    f"Column '{name}': 'distribution' {p} cannot be realized with {rows} rows"
+                )
+
+        total = sum([int(rows * p) for p in distribution]) + int(rows * null_ratio)
+        if total != rows:
+            raise SpecValidatorException(
+                f"Column '{name}': 'distribution' ratios and 'null_ratio' must together account for all {rows} rows"
             )
 
     @staticmethod
