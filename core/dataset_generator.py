@@ -9,6 +9,8 @@ from core.generators.string_generator import (
 )
 from core.generators.date_generator import DateGenerator
 from core.generators.conditional_generator import MapGenerator, RangeGenerator
+from core.generators.sequential_int_generator import SequentialIntGenerator
+from core.generators.regex_generator import RegexGenerator
 
 
 def validate_dependencies(graph: dict[str, set[str]]) -> None:

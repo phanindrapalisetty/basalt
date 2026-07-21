@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Any, List
 
-ALLOWED_TYPES = {"int", "float", "string", "boolean", "date"}
+ALLOWED_TYPES = {"int", "float", "string", "boolean", "date", "regex"}
 MAX_ROWS = int(os.getenv("MAX_ROWS", 5000))
 MAX_CELLS = int(os.getenv("MAX_CELLS", 1_000_000))
 
@@ -114,6 +114,8 @@ class SpecValidator:
             SpecValidator._validate_boolean_column(name, spec, rows)
         elif col_type == "date":
             SpecValidator._validate_date_column(name, spec, col_type, rows, unique)
+        elif col_type == "regex":
+            SpecValidator._validate_regex_column(name, spec)
 
     @staticmethod
     def _validate_string_column(
@@ -159,6 +161,30 @@ class SpecValidator:
     def _validate_int_column(
         name: str, spec: Dict[str, Any], col_type: str, rows: int, unique: bool
     ) -> None:
+        
+        sequential = spec.get("sequential", False)
+
+        if sequential:
+            if not isinstance(sequential, bool):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'sequential' must be a boolean"
+                )
+            if spec.get("null_ratio", 0.0) > 0:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'sequential' is incompatible with 'null_ratio' > 0"
+                )
+            start = spec.get("start", 1)
+            step = spec.get("step", 1)
+            if not isinstance(start, int):
+                raise SpecValidatorException(
+                    f"Column '{name}': 'start' must be an integer"
+                )
+            if not isinstance(step, int) or step == 0:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'step' must be a non-zero integer"
+                )
+            return
+        
         min_val = spec.get("min")
         max_val = spec.get("max")
 
@@ -469,6 +495,21 @@ class SpecValidator:
                     f"Column '{name}': map entry '{key}' 'distribution' does not sum to "
                     f"the {group_size} rows where '{depends_on}' = '{key}'"
                 )
+    
+    @staticmethod
+    def _validate_regex_column(name: str, spec: Dict[str, Any]) -> None:
+        import re
+        pattern = spec.get("pattern")
+        if not isinstance(pattern, str) or not pattern:
+            raise SpecValidatorException(
+                f"Column '{name}': 'pattern' is required and must be a non-empty string"
+            )
+        try:
+            re.compile(pattern)
+        except re.error as e:
+            raise SpecValidatorException(
+                f"Column '{name}': invalid regex pattern — {e}"
+            )
 
     @staticmethod
     def _validate_null_ratio(name: str, null_ratio: float, rows: int) -> None:
