@@ -59,10 +59,12 @@ class SpecValidator:
                     f"Column '{col_spec}' must be a JSON object"
                 )
 
-            SpecValidator._validate_column(col_name, col_spec, rows)
+            SpecValidator._validate_column(col_name, col_spec, rows, columns)
 
     @staticmethod
-    def _validate_column(name: str, spec: Dict[str, Any], rows: int) -> None:
+    def _validate_column(
+        name: str, spec: Dict[str, Any], rows: int, columns: Dict[str, Any]
+    ) -> None:
         col_type = spec.get("type")
 
         if col_type not in ALLOWED_TYPES:
@@ -86,6 +88,11 @@ class SpecValidator:
 
         if null_ratio != 0.0:
             SpecValidator._validate_null_ratio(name, null_ratio, rows)
+
+        # conditional columns (map / ranges) bypass normal type validation
+        if "map" in spec or "ranges" in spec:
+            SpecValidator._validate_conditional_column(name, spec, columns, rows)
+            return
 
         # column types validation
         if col_type == "string":
@@ -319,6 +326,140 @@ class SpecValidator:
             raise SpecValidatorException(
                 f"Column '{name}': 'values' and 'distribution' must have the same length"
             )
+
+    @staticmethod
+    def _validate_conditional_column(
+        name: str, spec: Dict[str, Any], columns: Dict[str, Any], rows: int
+    ) -> None:
+        depends_on = spec.get("depends_on")
+        if not isinstance(depends_on, str) or not depends_on:
+            raise SpecValidatorException(
+                f"Column '{name}': conditional columns require 'depends_on'"
+            )
+
+        if depends_on not in columns:
+            raise SpecValidatorException(
+                f"Column '{name}': 'depends_on' references unknown column '{depends_on}'"
+            )
+
+        if "map" in spec and "ranges" in spec:
+            raise SpecValidatorException(
+                f"Column '{name}': cannot specify both 'map' and 'ranges'"
+            )
+
+        if "map" in spec:
+            map_dict = spec["map"]
+            if not isinstance(map_dict, dict) or not map_dict:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'map' must be a non-empty object"
+                )
+
+            grouped_keys = [k for k, v in map_dict.items() if isinstance(v, dict)]
+            scalar_keys = [k for k, v in map_dict.items() if not isinstance(v, dict)]
+
+            if grouped_keys and scalar_keys:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'map' values must be either all scalars or all "
+                    "{'values', 'distribution'} objects, not a mix"
+                )
+
+            if grouped_keys:
+                SpecValidator._validate_grouped_map(
+                    name, map_dict, depends_on, columns, rows
+                )
+            else:
+                value_types = {type(v) for v in map_dict.values()}
+                if len(value_types) > 1:
+                    raise SpecValidatorException(
+                        f"Column '{name}': all values in 'map' must be the same type"
+                    )
+
+        elif "ranges" in spec:
+            ranges = spec["ranges"]
+            if not isinstance(ranges, list) or not ranges:
+                raise SpecValidatorException(
+                    f"Column '{name}': 'ranges' must be a non-empty array"
+                )
+            for r in ranges:
+                if not isinstance(r, dict) or "then" not in r:
+                    raise SpecValidatorException(
+                        f"Column '{name}': each range entry must have 'then'"
+                    )
+                lo = r.get("min")
+                hi = r.get("max")
+                if lo is not None and not isinstance(lo, (int, float)):
+                    raise SpecValidatorException(
+                        f"Column '{name}': range 'min' must be a number or null"
+                    )
+                if hi is not None and not isinstance(hi, (int, float)):
+                    raise SpecValidatorException(
+                        f"Column '{name}': range 'max' must be a number or null"
+                    )
+
+    @staticmethod
+    def _validate_grouped_map(
+        name: str,
+        map_dict: Dict[str, Any],
+        depends_on: str,
+        columns: Dict[str, Any],
+        rows: int,
+    ) -> None:
+        dep_spec = columns[depends_on]
+        dep_values = dep_spec.get("values")
+        dep_distribution = dep_spec.get("distribution")
+
+        if (
+            dep_spec.get("type") != "string"
+            or not isinstance(dep_values, list)
+            or not isinstance(dep_distribution, list)
+        ):
+            raise SpecValidatorException(
+                f"Column '{name}': ratio-based 'map' requires 'depends_on' column "
+                f"'{depends_on}' to be a string column with 'values' and 'distribution'"
+            )
+
+        group_sizes = {v: int(rows * p) for v, p in zip(dep_values, dep_distribution)}
+
+        for key, group in map_dict.items():
+            if key not in group_sizes:
+                raise SpecValidatorException(
+                    f"Column '{name}': map key '{key}' is not one of '{depends_on}'s values"
+                )
+
+            values = group.get("values")
+            distribution = group.get("distribution")
+
+            if not isinstance(values, list) or not values:
+                raise SpecValidatorException(
+                    f"Column '{name}': map entry '{key}' must have a non-empty 'values' list"
+                )
+            if not isinstance(distribution, list) or len(distribution) != len(values):
+                raise SpecValidatorException(
+                    f"Column '{name}': map entry '{key}' 'distribution' must be a list "
+                    "matching 'values' in length"
+                )
+
+            group_size = group_sizes[key]
+
+            for p in distribution:
+                if not isinstance(p, float):
+                    raise SpecValidatorException(
+                        f"Column '{name}': map entry '{key}' 'distribution' must be a "
+                        "list of floats"
+                    )
+                if not (group_size * p).is_integer():
+                    raise SpecValidatorException(
+                        f"Column '{name}': map entry '{key}' distribution {p} cannot be "
+                        f"realized for the {group_size} rows where "
+                        f"'{depends_on}' = '{key}'"
+                    )
+
+            total = sum(int(group_size * p) for p in distribution)
+            if total != group_size:
+                raise SpecValidatorException(
+                    f"Column '{name}': map entry '{key}' 'distribution' does not sum to "
+                    f"the {group_size} rows where '{depends_on}' = '{key}'"
+                )
 
     @staticmethod
     def _validate_null_ratio(name: str, null_ratio: float, rows: int) -> None:
