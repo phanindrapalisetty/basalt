@@ -1,5 +1,8 @@
-fastapi 
-uvicorn 
-requests
-pytest
-mangum
+fastapi==0.115.6
+uvicorn==0.34.0
+mangum==0.19.0
+slowapi==0.1.9
+rstr==3.2.2
+fastavro==1.9.7
+# pyarrow is large (~40MB); exclude for lightweight/Lambda deployments that don't need Parquet
+pyarrow==18.1.0
