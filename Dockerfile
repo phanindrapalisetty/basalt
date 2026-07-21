@@ -1,13 +1,9 @@
-FROM public.ecr.aws/lambda/python:3.10
+FROM python:3.10-slim
 
-# Copy dependencies first (better caching)
+WORKDIR /basalt
+ADD . .
 COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY api ./api
-COPY core ./core
-
-# Lambda handler
-CMD ["api.lambda_handler.handler"]
+EXPOSE 8000
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
