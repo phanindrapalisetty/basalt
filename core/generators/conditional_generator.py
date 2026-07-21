@@ -1,5 +1,6 @@
 from core.spec_validator import SpecValidatorException
 from core.random_context import RandomContext
+from core.generators.string_generator import _weights_to_counts
 
 
 class MapGenerator:
@@ -37,9 +38,17 @@ class MapGenerator:
                 values = group["values"]
                 distribution = group["distribution"]
 
+                all_int = all(
+                    isinstance(p, int) and not isinstance(p, bool) for p in distribution
+                )
+                if all_int:
+                    counts = _weights_to_counts(distribution, size)
+                else:
+                    counts = [int(size * p) for p in distribution]
+
                 seq = []
-                for v, p in zip(values, distribution):
-                    seq += [v] * int(size * p)
+                for v, count in zip(values, counts):
+                    seq += [v] * count
                 local_rng.shuffle(seq)
 
                 self._sequences[key] = seq

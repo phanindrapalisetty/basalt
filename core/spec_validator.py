@@ -476,12 +476,27 @@ class SpecValidator:
 
             group_size = group_sizes[key]
 
+            all_int = all(isinstance(p, int) and not isinstance(p, bool) for p in distribution)
+            all_float = all(isinstance(p, float) for p in distribution)
+
+            if not all_int and not all_float:
+                raise SpecValidatorException(
+                    f"Column '{name}': map entry '{key}' 'distribution' must be all floats "
+                    "(ratios) or all ints (weights), not mixed"
+                )
+
+            if all_int:
+                # Weights mode — normalized at generation time; no exact-division check needed
+                for w in distribution:
+                    if w <= 0:
+                        raise SpecValidatorException(
+                            f"Column '{name}': map entry '{key}' 'distribution' weights must "
+                            f"be positive integers, got {w}"
+                        )
+                continue
+
+            # Ratios mode (all float) — existing strict checks
             for p in distribution:
-                if not isinstance(p, float):
-                    raise SpecValidatorException(
-                        f"Column '{name}': map entry '{key}' 'distribution' must be a "
-                        "list of floats"
-                    )
                 if not (group_size * p).is_integer():
                     raise SpecValidatorException(
                         f"Column '{name}': map entry '{key}' distribution {p} cannot be "
