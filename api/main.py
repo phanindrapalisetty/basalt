@@ -25,11 +25,6 @@ async def get_health_status():
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=400)
 
-# Backwards-compat redirects (308 preserves the request method and body)
-@app.post("/generate")
-async def generate_compat():
-    return RedirectResponse(url="/v1/generate", status_code=308)
-
 @app.post("/validate", description="Validate a spec without generating data")
 async def validate(pay_load: dict):
     try:
